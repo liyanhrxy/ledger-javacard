@@ -168,6 +168,7 @@ public class Crypto {
         // recheck with the target platform, initializing once instead might be possible and save a few flash write
         // (this part is unspecified in the Java Card API)
         signature.init(transientPrivate, Signature.MODE_SIGN);
+        // 该函数会对传入数据先进行sha256，再做签名
         signature.sign(dataBuffer, dataOffset, (short)32, targetBuffer, targetOffset);
         if (transientPrivateTransient) {
             transientPrivate.clearKey();

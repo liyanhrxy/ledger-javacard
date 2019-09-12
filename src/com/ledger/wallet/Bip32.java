@@ -29,7 +29,7 @@ public class Bip32 {
 	
 	private static final byte BITCOIN_SEED[] = {
 		'B', 'i', 't', 'c', 'o', 'i', 'n', ' ', 's', 'e', 'e', 'd'
-	};		
+	};
 	
 	private static final short OFFSET_TMP = (short)100;	
 	private static final short OFFSET_BLOCK = (short)127;
@@ -46,7 +46,7 @@ public class Bip32 {
 	// would solve it
 	public static void deriveSeed(byte seedLength) {
 		if (Crypto.signatureHmac != null) {
-			// 初始化HMACKey
+			// 初始化HMACKey以 BITCOIN_SEED字节数组做key
 			Crypto.keyHmac2.setKey(BITCOIN_SEED, (short)0, (short)BITCOIN_SEED.length);
 			if ((LedgerWalletApplet.proprietaryAPI != null) && (LedgerWalletApplet.proprietaryAPI.hasHmacSHA512())) {
 				LedgerWalletApplet.proprietaryAPI.hmacSHA512(Crypto.keyHmac2, LedgerWalletApplet.scratch256, (short)0, seedLength, LedgerWalletApplet.masterDerived, (short)0);
@@ -106,7 +106,7 @@ public class Bip32 {
 			 * ArrayIndexOutOfBoundsException - if kOff is negative or the keyData array is too short
 			 * NullPointerException - if the keyData parameter is null
 			 * */
-			Crypto.keyHmac.setKey(LedgerWalletApplet.scratch256, (short)32, (short)32); // chinCode
+			Crypto.keyHmac.setKey(LedgerWalletApplet.scratch256, (short)32, (short)32); // 以chinCode作为key
 			if ((LedgerWalletApplet.proprietaryAPI != null) && (LedgerWalletApplet.proprietaryAPI.hasHmacSHA512())) {
 				LedgerWalletApplet.proprietaryAPI.hmacSHA512(Crypto.keyHmac, LedgerWalletApplet.scratch256, OFFSET_TMP, (short)37, LedgerWalletApplet.scratch256, OFFSET_TMP);
 			}

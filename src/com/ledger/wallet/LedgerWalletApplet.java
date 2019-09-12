@@ -40,7 +40,7 @@ public class LedgerWalletApplet extends Applet {
         walletPin = new OwnerPIN(WALLET_PIN_ATTEMPTS, WALLET_PIN_SIZE);
         secondaryPin = new OwnerPIN(SECONDARY_PIN_ATTEMPTS, SECONDARY_PIN_SIZE);
         masterDerived = new byte[64];
-        chipKey = (DESKey) KeyBuilder.buildKey(KeyBuilder.TYPE_DES, KeyBuilder.LENGTH_DES3_2KEY, false);
+        chipKey = (DESKey) KeyBuilder.buildKey(KeyBuilder.TYPE_DES, KeyBuilder.LENGTH_DES3_2KEY, false); // 卡内随机生成，用于加密种子
         trustedInputKey = (DESKey) KeyBuilder.buildKey(KeyBuilder.TYPE_DES, KeyBuilder.LENGTH_DES3_2KEY, false);
         developerKey = (DESKey) KeyBuilder.buildKey(KeyBuilder.TYPE_DES, KeyBuilder.LENGTH_DES3_2KEY, false);
         try {
@@ -61,21 +61,21 @@ public class LedgerWalletApplet extends Applet {
 
     private static void reset() {
         Crypto.random.generateData(scratch256, (short) 0, (short) 16); // 128bits 熵源
-        chipKey.setKey(scratch256, (short) 0);
+        chipKey.setKey(scratch256, (short) 0); // 重置chipKey
         Util.arrayFillNonAtomic(scratch256, (short) 0, (short) 16, (byte) 0x00); // 清空scratch256
         setup = TC.FALSE;
         limitsSet = TC.FALSE;
     }
 
-    protected static void writeIdleText() {
+    protected static void writeIdleText() { // 屏幕显示相关
         short offset = Util.arrayCopyNonAtomic(TEXT_IDLE, (short) 0, LWNFCForumApplet.FILE_DATA, LWNFCForumApplet.OFFSET_TEXT, (short) TEXT_IDLE.length);
         LWNFCForumApplet.writeHeader((short) (offset - LWNFCForumApplet.OFFSET_TEXT));
     }
 
-    protected static boolean isContactless() {
+    protected static boolean isContactless() { // 检查协议类型是否为非接触式
         return ((APDU.getProtocol() & APDU.PROTOCOL_MEDIA_MASK) == APDU.PROTOCOL_MEDIA_CONTACTLESS_TYPE_A);
     }
-
+   // 检查访问条件
     private static void checkAccess(boolean checkPinContactless) {
         if ((setup == TC.FALSE) || (setup != TC.TRUE)) {
             ISOException.throwIt(ISO7816.SW_CONDITIONS_NOT_SATISFIED);
@@ -87,14 +87,14 @@ public class LedgerWalletApplet extends Applet {
             ISOException.throwIt(ISO7816.SW_SECURITY_STATUS_NOT_SATISFIED);
         }
     }
-
+    // 检查接口一致性
     private static void checkInterfaceConsistency() {
         if ((isContactless() && (TC.ctxP[TC.P_TX_Z_WIRED] != TC.FALSE)) ||
                 (!isContactless() && (TC.ctxP[TC.P_TX_Z_WIRED] != TC.TRUE))) {
             ISOException.throwIt(ISO7816.SW_CONDITIONS_NOT_SATISFIED);
         }
     }
-
+    // 验证校验码
     private static void verifyKeyChecksum(byte[] buffer, short offset, short length, byte[] scratch, short scratchOffset) {
         Crypto.digestScratch.doFinal(buffer, offset, (short) (length - 4), scratch, scratchOffset);
         Crypto.digestScratch.doFinal(scratch, scratchOffset, TC.SIZEOF_SHA256, scratch, scratchOffset);
@@ -102,7 +102,7 @@ public class LedgerWalletApplet extends Applet {
             ISOException.throwIt(ISO7816.SW_WRONG_DATA);
         }
     }
-
+    // 压缩公钥生成地址
     private static short publicKeyToAddress(byte[] out, short outOffset) {
         Crypto.digestScratch.doFinal(scratch256, (short) 0, (short) 33, scratch256, (short) 33);
         if (Crypto.digestRipemd != null) {
@@ -115,7 +115,7 @@ public class LedgerWalletApplet extends Applet {
         Crypto.digestScratch.doFinal(scratch256, (short) 21, (short) 32, scratch256, (short) 21);
         return Base58.encode(scratch256, (short) 0, (short) 25, out, outOffset, scratch256, (short) 100);
     }
-
+    // 签名
     private static void signTransientPrivate(byte[] keyBuffer, short keyOffset, byte[] dataBuffer, short dataOffset, byte[] targetBuffer, short targetOffset) {
         if ((proprietaryAPI == null) || (!proprietaryAPI.hasDeterministicECDSASHA256())) {
             Crypto.signTransientPrivate(keyBuffer, keyOffset, dataBuffer, dataOffset, targetBuffer, targetOffset);
