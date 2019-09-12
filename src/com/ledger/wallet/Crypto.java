@@ -21,9 +21,9 @@ package com.ledger.wallet;
 
 import javacard.framework.JCSystem;
 import javacard.framework.Util;
+import javacard.security.AESKey;
 import javacard.security.CryptoException;
 import javacard.security.DESKey;
-import javacard.security.AESKey;
 import javacard.security.ECKey;
 import javacard.security.ECPrivateKey;
 import javacard.security.ECPublicKey;
@@ -109,7 +109,7 @@ public class Crypto {
         }
         // Optional initializations if no proprietary API is available
         try {
-        	keyAgreement = KeyAgreement.getInstance(KeyAgreement.ALG_EC_SVDP_DH_PLAIN, false);
+        	keyAgreement = KeyAgreement.getInstance(KeyAgreement.ALG_EC_SVDP_DH_PLAIN, false); // 指定密钥协商算法
         }
         catch(CryptoException e) {
         	// Not having the KeyAgreement API is manageable if there is a proprietary API to recover public keys
@@ -142,7 +142,24 @@ public class Crypto {
         if (transientPrivateTransient) {
         	Secp256k1.setCommonCurveParameters(transientPrivate);
         }
-        transientPrivate.setS(keyBuffer, keyOffset, (short)32);    	
+        /***
+         * void setS(byte[] buffer,
+         *         short offset,
+         *         short length)
+         *           throws CryptoException
+         * Sets the value of the secret key. The plain text data format is big-endian and right-aligned (the least significant bit is the least significant bit of last byte). Input parameter data is copied into the internal representation.
+         * Note:
+         *
+         * If the key object implements the javacardx.crypto.KeyEncryption interface and the Cipher object specified via setKeyCipher() is not null, the key value is decrypted using the Cipher object.
+         * Parameters:
+         * buffer - the input buffer
+         * offset - the offset into the input buffer at which the secret value is to begin
+         * length - the byte length of the secret value
+         * Throws:
+         * CryptoException - with the following reason code:
+         * CryptoException.ILLEGAL_VALUE if the length parameter is 0 or invalid or the input key data is inconsistent with the key length or if input data decryption is required and fails.
+         * */
+        transientPrivate.setS(keyBuffer, keyOffset, (short)32); // 填充私钥到transientPrivate对象
     }
     
     public static void signTransientPrivate(byte[] keyBuffer, short keyOffset, byte[] dataBuffer, short dataOffset, byte[] targetBuffer, short targetOffset) {

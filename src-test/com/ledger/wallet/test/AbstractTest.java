@@ -20,24 +20,22 @@
 
 package com.ledger.wallet.test;
 
-import java.math.BigInteger;
-import java.util.Arrays;
-import junit.framework.TestCase;
+import com.btchip.BTChipConstants;
+import com.btchip.BTChipDongle;
+import com.btchip.BTChipException;
+import com.ledger.wallet.LedgerWalletApplet;
 import com.licel.jcardsim.base.Simulator;
-import com.licel.jcardsim.utils.AIDUtil;
-import com.licel.jcardsim.utils.ByteUtil;
-import com.licel.jcardsim.bouncycastle.asn1.ASN1Sequence;
 import com.licel.jcardsim.bouncycastle.asn1.ASN1EncodableVector;
-import com.licel.jcardsim.bouncycastle.asn1.ASN1Primitive;
 import com.licel.jcardsim.bouncycastle.asn1.DERInteger;
 import com.licel.jcardsim.bouncycastle.asn1.DERSequence;
+import com.licel.jcardsim.utils.AIDUtil;
+import com.licel.jcardsim.utils.ByteUtil;
 import javacard.framework.AID;
-import javacard.framework.ISO7816;
-import com.ledger.wallet.LedgerWalletApplet;
-import com.btchip.BTChipDongle;
-import com.btchip.BTChipConstants;
-import com.btchip.BTChipException;
+import junit.framework.TestCase;
+import org.bouncycastle.asn1.ASN1Primitive;
+import org.bouncycastle.asn1.ASN1Sequence;
 
+import java.math.BigInteger;
 
 public abstract class AbstractTest extends TestCase {
 
@@ -72,7 +70,7 @@ public abstract class AbstractTest extends TestCase {
 		assertTrue(simulator.selectApplet(INSTANCE_AID));		
 		JCardSIMTransport transport = new JCardSIMTransport(simulator, debug);
 		BTChipDongle dongle = new BTChipDongle(transport);
-		dongle.setKeycardSeed(DEFAULT_KEYCARD_ADDRESS_SIZE, DEFAULT_KEYCARD);		
+		dongle.setKeycardSeed(DEFAULT_KEYCARD_ADDRESS_SIZE, DEFAULT_KEYCARD);
 		return dongle;
 	}
 

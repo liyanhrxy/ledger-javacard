@@ -20,17 +20,11 @@
 
 package com.ledger.wallet.test;
 
-import java.util.Arrays;
-import junit.framework.TestCase;
-import com.licel.jcardsim.base.Simulator;
-import com.licel.jcardsim.utils.AIDUtil;
-import com.licel.jcardsim.utils.ByteUtil;
-import javacard.framework.AID;
-import javacard.framework.ISO7816;
-import com.ledger.wallet.LedgerWalletApplet;
 import com.btchip.BTChipDongle;
-import com.btchip.BTChipConstants;
 import com.btchip.BTChipException;
+import com.licel.jcardsim.utils.ByteUtil;
+
+import java.util.Arrays;
 
 public class TestSignMessage extends AbstractTest {
 

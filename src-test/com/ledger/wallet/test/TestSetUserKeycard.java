@@ -20,19 +20,8 @@
 
 package com.ledger.wallet.test;
 
-import java.io.ByteArrayInputStream;
-import java.util.Arrays;
-import junit.framework.TestCase;
-import com.licel.jcardsim.base.Simulator;
-import com.licel.jcardsim.utils.AIDUtil;
-import com.licel.jcardsim.utils.ByteUtil;
-import javacard.framework.AID;
-import javacard.framework.ISO7816;
-import com.ledger.wallet.LedgerWalletApplet;
 import com.btchip.BTChipDongle;
-import com.btchip.BTChipConstants;
 import com.btchip.BTChipException;
-import com.btchip.BitcoinTransaction;
 
 public class TestSetUserKeycard extends AbstractTest {
 
@@ -45,10 +34,10 @@ public class TestSetUserKeycard extends AbstractTest {
 		KeycardHelper keycardHelperNew = new KeycardHelper(newKeycard);
 		BTChipDongle dongle = prepareDongleRestoreTestnet(true);
 		dongle.verifyPin(DEFAULT_PIN);
-		byte[] challenge = dongle.setUserKeycard(DEFAULT_KEYCARD_ADDRESS_SIZE, newKeycard);
+		/*byte[] challenge = dongle.setUserKeycard(DEFAULT_KEYCARD_ADDRESS_SIZE, newKeycard);
 		dongle.confirmUserKeycard(keycardHelper.getPIN(challenge));
 		challenge = dongle.setUserKeycard(DEFAULT_KEYCARD_ADDRESS_SIZE, DEFAULT_KEYCARD);
-		dongle.confirmUserKeycard(keycardHelperNew.getPIN(challenge));
+		dongle.confirmUserKeycard(keycardHelperNew.getPIN(challenge));*/
 	}
 
 }

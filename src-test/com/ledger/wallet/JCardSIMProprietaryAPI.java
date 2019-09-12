@@ -36,8 +36,8 @@ public class JCardSIMProprietaryAPI implements ProprietaryAPI {
 	
 	public JCardSIMProprietaryAPI() {
 		try {
-			keyAgreement = com.licel.jcardsim.extensions.security.KeyAgreement.getInstance(com.licel.jcardsim.extensions.security.KeyAgreement.ALG_EC_SVDP_DH_PLAIN_XY, false);
-			signature = com.licel.jcardsim.extensions.security.Signature.getInstance(com.licel.jcardsim.extensions.security.Signature.ALG_ECDSA_SHA_256_RFC6979, false);
+			keyAgreement = KeyAgreement.getInstance(KeyAgreement.ALG_EC_SVDP_DH_PLAIN, false);
+			signature = Signature.getInstance(Signature.ALG_ECDSA_SHA_256, false);
 		}
 		catch(Exception e) {			
 		}
