@@ -23,8 +23,21 @@
 
 package com.ledger.wallet;
 
-import javacard.framework.*;
-import javacard.security.*;
+
+import javacard.framework.APDU;
+import javacard.framework.Applet;
+import javacard.framework.CardRuntimeException;
+import javacard.framework.ISO7816;
+import javacard.framework.ISOException;
+import javacard.framework.JCSystem;
+import javacard.framework.OwnerPIN;
+import javacard.framework.Util;
+import javacard.security.AESKey;
+import javacard.security.DESKey;
+import javacard.security.ECPrivateKey;
+import javacard.security.ECPublicKey;
+import javacard.security.KeyBuilder;
+import javacard.security.Signature;
 
 public class LedgerWalletApplet extends Applet {
     public LedgerWalletApplet(byte[] parameters, short parametersOffset, byte parametersLength) {
@@ -37,10 +50,11 @@ public class LedgerWalletApplet extends Applet {
         limits = new byte[LIMIT_LAST];
         scratch256 = JCSystem.makeTransientByteArray((short) 256, JCSystem.CLEAR_ON_DESELECT);
         transactionPin = new OwnerPIN(TRANSACTION_PIN_ATTEMPTS, TRANSACTION_PIN_SIZE);
+        // pin's flag is transient byteArray's first byte
         walletPin = new OwnerPIN(WALLET_PIN_ATTEMPTS, WALLET_PIN_SIZE);
         secondaryPin = new OwnerPIN(SECONDARY_PIN_ATTEMPTS, SECONDARY_PIN_SIZE);
         masterDerived = new byte[64];
-        chipKey = (DESKey) KeyBuilder.buildKey(KeyBuilder.TYPE_DES, KeyBuilder.LENGTH_DES3_2KEY, false); // 卡内随机生成，用于加密种子
+        chipKey = (DESKey) KeyBuilder.buildKey(KeyBuilder.TYPE_DES, KeyBuilder.LENGTH_DES3_2KEY, false); // 卡内随机生成，用于masterPrivateKey and master chainCode
         trustedInputKey = (DESKey) KeyBuilder.buildKey(KeyBuilder.TYPE_DES, KeyBuilder.LENGTH_DES3_2KEY, false);
         developerKey = (DESKey) KeyBuilder.buildKey(KeyBuilder.TYPE_DES, KeyBuilder.LENGTH_DES3_2KEY, false);
         try {
@@ -77,7 +91,7 @@ public class LedgerWalletApplet extends Applet {
     }
    // 检查访问条件
     private static void checkAccess(boolean checkPinContactless) {
-        if ((setup == TC.FALSE) || (setup != TC.TRUE)) {
+        if ((setup != TC.TRUE)) {
             ISOException.throwIt(ISO7816.SW_CONDITIONS_NOT_SATISFIED);
         }
         if (!isContactless() && !walletPin.isValidated()) {
@@ -1200,7 +1214,7 @@ public class LedgerWalletApplet extends Applet {
             ISOException.throwIt(ISO7816.SW_CLA_NOT_SUPPORTED);
         }
     }
-
+    // bArray = len(aid) + aid + len(control info) + control info + len(appletData) + appletData
     public static void install(byte bArray[], short bOffset, byte bLength) throws ISOException {
         short offset = bOffset;
         offset += (short) (bArray[offset] + 1);
